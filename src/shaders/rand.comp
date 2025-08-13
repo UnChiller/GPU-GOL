@@ -1,0 +1,27 @@
+#version 430
+
+layout(local_size_x = 256, local_size_y = 1, local_size_z = 1) in;
+
+// We'll treat the buffer as 1 byte = 8 pixels (1 bpp)
+layout(std430, binding = 0) buffer PixelBuffer {
+    uint data[];
+};
+
+// Simple pseudo-random function
+uint rand(uint seed) {
+    seed ^= seed >> 17;
+    seed *= 0xed5ad4bbU;
+    seed ^= seed >> 11;
+    seed *= 0xac4c1b51U;
+    seed ^= seed >> 15;
+    seed *= 0x31848babU;
+    seed ^= seed >> 14;
+    return seed;
+}
+
+void main() {
+    uint index = gl_GlobalInvocationID.x;
+    uint seed = index * 747796405u + 2891336453u; // arbitrary
+    uint r = rand(seed);
+    data[index] = r; // each uint holds 32 pixels at 1 bpp
+}
