@@ -6,7 +6,7 @@ layout(std430, binding = 0) buffer PixelBuffer {
 
 uniform uvec2 bufSize;      // Width of the buffer in pixels
 uniform uint scale;         // Pixel scale factor
-uniform uvec2 position;    // Position on screen (top-left of scaled buffer)
+uniform uvec2 position;    // Position on screen
 
 out vec4 fragColor;
 
