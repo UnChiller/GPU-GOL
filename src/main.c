@@ -51,6 +51,29 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
     }
 }
 
+double scroll = 0;
+
+void scroll_callback(GLFWwindow * window, double xoffset, double yoffset) {
+    (void)window;
+    (void)xoffset;
+    GLuint oldScale = scale;
+    scroll += yoffset;
+    GLint offset = scroll;
+    scroll -= offset;
+    GLuint newScale = scale + offset;
+    if (newScale < 1) {
+        scale = 1;
+    } else {
+        scale = newScale;
+    }
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+    posX=(posX+xpos)*scale/oldScale-xpos;
+    posY=(posY+height-ypos)*scale/oldScale+ypos-height;
+}
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     (void)scancode;
     (void)mods;
@@ -81,11 +104,19 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
                 break;
             case GLFW_KEY_KP_ADD:
             case GLFW_KEY_EQUAL:
+                int width, height;
+                glfwGetWindowSize(window, &width, &height);
+                posX=(posX+width/2)*(scale+1)/scale-width/2;
+                posY=(posY+height-height/2)*(scale+1)/scale+height/2-height;
                 scale++;
                 break;
             case GLFW_KEY_KP_SUBTRACT:
             case GLFW_KEY_MINUS:
                 if (scale > 1) {
+                    int width, height;
+                    glfwGetWindowSize(window, &width, &height);
+                    posX=(posX+width/2)*(scale-1)/scale-width/2;
+                    posY=(posY+height-height/2)*(scale-1)/scale+height/2-height;
                     scale--;
                 }
                 break;
@@ -225,6 +256,7 @@ int main() {
     #ifdef ALLOW_INTERACTION
     glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetCursorPosCallback(window, cursor_position_callback);
+    glfwSetScrollCallback(window, scroll_callback);
     glfwSetKeyCallback(window, key_callback);
     #endif
 
